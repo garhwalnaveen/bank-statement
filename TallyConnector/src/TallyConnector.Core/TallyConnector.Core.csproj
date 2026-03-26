@@ -1,0 +1,52 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<AssemblyName>TallyConnector.Core</AssemblyName>
+		<LangVersion>latest</LangVersion>
+		<PackageTags>tally,xml,tallyprime,tallyerp9,tallyxml</PackageTags>
+
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<Authors>saivineeth</Authors>
+		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+		<RepositoryUrl>https://github.com/Accounting-Companion/TallyConnector.git</RepositoryUrl>
+		<PackageProjectUrl>https://github.com/Accounting-Companion/TallyConnector</PackageProjectUrl>
+		<Description>
+			This package includes Models,Converters,Attributes for TallyConnector:
+			- Converters : Custom XML and Json converters for complex Tally Data like - Amount, units ..etc.,
+			- Attributes : Attributes that help creating custom TDL report in XML
+			- Models     : Models contains the objects like ledgers, groups , vouchers and their Childs
+		</Description>
+		<RepositoryType>git</RepositoryType>
+		<!--<VersionSuffix>rc</VersionSuffix>-->
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<!--<GenerateDocumentationFile>True</GenerateDocumentationFile>-->
+		<EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+	<CompilerGeneratedFilesOutputPath>Generated</CompilerGeneratedFilesOutputPath>
+	</PropertyGroup>
+
+
+	<ItemGroup>
+		<Compile Remove="Generated\**\*" />
+	</ItemGroup>
+	<ItemGroup Condition=" '$(TargetFramework)' == 'net48'">
+		<Reference Include="Microsoft.CSharp" />
+		<Reference Include="System.ComponentModel.DataAnnotations" />
+		<PackageReference Include="System.Net.Http" />
+		<PackageReference Include="XmlSourceGenerator" />
+		<PackageReference Include="System.Text.Json" />
+	</ItemGroup>
+	<ItemGroup>
+	  <Folder Include="Models\Common\" />
+	  <Folder Include="Models\Meta\" />
+	</ItemGroup>
+	<ItemGroup>
+	  <!--<ProjectReference Include="..\..\..\XmlSourceGenerator\src\XmlSourceGenerator\XmlSourceGenerator.csproj" OutputItemType="Analyzer" />-->
+	  <ProjectReference Include="..\SourceGenerators\TallyConnector.TDLReportSourceGenerator\TallyConnector.TDLReportSourceGenerator.csproj" OutputItemType="Analyzer" />
+	  <ProjectReference Include="..\TallyConnector.Abstractions\TallyConnector.Abstractions.csproj" />
+
+	</ItemGroup>
+
+</Project>

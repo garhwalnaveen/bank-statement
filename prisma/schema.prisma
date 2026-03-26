@@ -1,0 +1,138 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Client (Tally Company) ───────────────────────────────────────────────
+
+model Client {
+  id               String   @id @default(cuid())
+  teamId           String
+  name             String            // Display name (e.g. "Hinsons Carbons")
+  tallyCompanyName String?           // Exact Tally company name for sync
+  bankName         String?           // Associated bank
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  ledgers    Ledger[]
+  rules      Rule[]
+  statements Statement[]
+
+  @@index([teamId])
+}
+
+// ─── Ledger (synced from Tally or manually created) ───────────────────────
+
+model Ledger {
+  id        String   @id @default(cuid())
+  clientId  String
+  name      String            // Ledger name in Tally
+  group     String?           // Parent group (e.g. "Sundry Debtors", "Bank Accounts")
+  syncedAt  DateTime?         // Last sync from Tally
+  createdAt DateTime @default(now())
+
+  client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@unique([clientId, name])
+  @@index([clientId])
+}
+
+// ─── Statement (uploaded bank statement) ──────────────────────────────────
+
+model Statement {
+  id               String   @id @default(cuid())
+  teamId           String
+  clientId         String?
+  filename         String
+  uploadedAt       DateTime @default(now())
+  bankName         String?
+  accountNumber    String?
+  currency         String?
+  periodFrom       String?
+  periodTo         String?
+  openingBalance   Float?
+  closingBalance   Float?
+  transactionCount Int      @default(0)
+  isValid          Boolean  @default(false)
+  accuracyPct      Float?
+  warnings         String[] @default([])
+
+  client       Client?       @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  transactions Transaction[]
+
+  @@index([teamId, uploadedAt(sort: Desc)])
+  @@index([clientId])
+}
+
+// ─── Transaction (individual bank transaction) ───────────────────────────
+
+model Transaction {
+  id              String   @id @default(cuid())
+  statementId     String
+  srNo            Int               // Row number in statement
+  date            String?
+  description     String?           // Narration
+  amount          Float?
+  debit           Float?
+  credit          Float?
+  balance         Float?
+  reference       String?
+  // Ledger assignment
+  transactionType String?           // "Receipt" | "Payment" | "Contra" | "Journal"
+  ledgerName      String?           // Assigned ledger name
+  isAutoMatched   Boolean  @default(false)  // true if matched by rule
+  isManual        Boolean  @default(false)  // true if manually assigned
+  ruleId          String?           // Rule that matched this
+
+  statement Statement @relation(fields: [statementId], references: [id], onDelete: Cascade)
+
+  @@index([statementId])
+}
+
+// ─── Rule (narration-based auto-matching) ─────────────────────────────────
+
+model Rule {
+  id              String   @id @default(cuid())
+  clientId        String
+  pattern         String            // Text pattern to match
+  matchType       String   @default("contains") // "contains" | "exact" | "startsWith"
+  ledgerName      String            // Auto-assign this ledger
+  transactionType String            // "Receipt" | "Payment"
+  priority        Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@index([clientId])
+}
+
+// ─── TallySettings (per-team Tally connection config) ─────────────────────
+
+model TallySettings {
+  id          String   @id @default(cuid())
+  teamId      String   @unique
+  host        String   @default("localhost")
+  port        Int      @default(9000)
+  companyName String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// ─── TallyToken (long-lived auth token for desktop sync agent) ─────────────
+
+model TallyToken {
+  id          String    @id @default(cuid())
+  teamId      String
+  name        String    @default("Sync Token")
+  tokenHash   String    @unique       // SHA-256 hash of raw token
+  tokenPrefix String                  // First 8 chars for display (e.g. "tc_abc123")
+  lastUsedAt  DateTime?
+  createdAt   DateTime  @default(now())
+
+  @@index([teamId])
+}

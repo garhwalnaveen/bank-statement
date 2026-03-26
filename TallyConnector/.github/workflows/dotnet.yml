@@ -1,0 +1,33 @@
+name: Publish to Nugget
+
+on:
+  push:
+    tags:
+      - "V*"
+env:
+  SOLUTION_PATH: "TallyConnectorr_Nugget.sln"
+  PACKAGE_OUTPUT_DIRECTORY: ${{ github.workspace }}\output
+  NUGET_SOURCE_URL: "https://api.nuget.org/v3/index.json"
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup .NET Framework
+        uses: microsoft/setup-msbuild@v1.1
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: |
+            8.0.x
+            9.0.x
+      - name: Set NUGGET_VERSION ENV From TAG
+        run: echo "NUGGET_VERSION=$("${{github.ref_name}}".replace('V',''))" >> $env:GITHUB_ENV
+      # - name: TEST Tag
+      #   run: echo $env:NUGGET_VERSION
+      - name: "Build Solution"
+        run: dotnet build ${{ env.SOLUTION_PATH }} --configuration Release /p:VersionPrefix=$env:NUGGET_VERSION
+      - name: "Pack All Projects in Solution"
+        run: dotnet pack ${{ env.SOLUTION_PATH }} --no-restore --no-build --configuration Release --output ${{ env.PACKAGE_OUTPUT_DIRECTORY }} /p:VersionPrefix=$env:NUGGET_VERSION
+      - name: "Push package"
+        run: dotnet nuget push ${{ env.PACKAGE_OUTPUT_DIRECTORY }}\*.nupkg -k ${{ secrets.NUGGET_KEY }} -s ${{ env.NUGET_SOURCE_URL }}

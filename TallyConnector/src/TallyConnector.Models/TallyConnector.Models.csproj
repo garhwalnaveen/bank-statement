@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+
+	  <AssemblyName>TallyConnector.Models</AssemblyName>
+	  <!--<VersionSuffix>rc</VersionSuffix>-->
+	  <GenerateDocumentationFile>True</GenerateDocumentationFile>
+	  <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+	  <CompilerGeneratedFilesOutputPath>Generated</CompilerGeneratedFilesOutputPath>
+  </PropertyGroup>
+
+	<ItemGroup>
+		<Compile Remove="Generated\**\*" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <PackageReference Include="XmlSourceGenerator" />
+	</ItemGroup>
+  <ItemGroup>
+
+    <ProjectReference Include="..\TallyConnector.Core\TallyConnector.Core.csproj" />
+  </ItemGroup>
+
+	<ItemGroup>
+
+		<ProjectReference Include="..\SourceGenerators\TallyConnector.TDLReportSourceGenerator\TallyConnector.TDLReportSourceGenerator.csproj" OutputItemType="Analyzer" />
+		<!--<ProjectReference Include="..\..\..\XmlSourceGenerator\src\XmlSourceGenerator\XmlSourceGenerator.csproj" OutputItemType="Analyzer" />-->
+	</ItemGroup>
+
+</Project>

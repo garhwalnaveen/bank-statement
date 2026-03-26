@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+
+	  <OutputType>Library</OutputType>
+	  <AssemblyName>TallyConnector.Abstractions</AssemblyName>
+	  <LangVersion>latest</LangVersion>
+	  <Authors>saivineeth</Authors>
+	  <Nullable>enable</Nullable>
+	  <ImplicitUsings>enable</ImplicitUsings>
+	  <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+  </PropertyGroup>
+
+</Project>

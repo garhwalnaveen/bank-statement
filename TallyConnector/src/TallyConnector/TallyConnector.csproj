@@ -1,0 +1,42 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<IncludeAllContentForSelfExtract>true</IncludeAllContentForSelfExtract>
+		<OutputType>Library</OutputType>
+		<AssemblyName>TallyConnector</AssemblyName>
+		<Description>
+			Using This library we can interact with Tally prime / Tally erp9 easily without knowing
+			Tally XML.
+			- We can Create,Alter and Delete all types of masters, and Vouchers
+			- Get Custom TDL reports Based on C# object
+			- Have support for Custom Fields, and computed fields
+		</Description>
+
+		<GenerateDocumentationFile>True</GenerateDocumentationFile>
+		<EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+		<CompilerGeneratedFilesOutputPath>Generated</CompilerGeneratedFilesOutputPath>
+	</PropertyGroup>
+
+
+	<ItemGroup>
+		<PackageReference Include="System.Diagnostics.DiagnosticSource" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
+	</ItemGroup>
+
+
+	<ItemGroup>
+		<Compile Remove="Generated\**\*" />
+		<Compile Remove="_Generated\**\*" />
+	</ItemGroup>
+
+
+	<ItemGroup>
+		<ProjectReference Include="..\SourceGenerators\TallyConnector.TDLReportSourceGenerator\TallyConnector.TDLReportSourceGenerator.csproj" OutputItemType="Analyzer" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\TallyConnector.Models\TallyConnector.Models.csproj" />
+	</ItemGroup>
+
+
+</Project>

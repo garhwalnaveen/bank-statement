@@ -1,0 +1,58 @@
+﻿namespace TallyConnector.Models.Common;
+public partial class BaseStatistics : IBaseObject
+{
+    [XmlElement(ElementName = "COUNT")]
+    [TDLField(Set = "if $$ISEMPTY:$StatVal then 0 else $StatVal")]
+    public ulong Count { get; set; }
+}
+
+[TDLCollection(CollectionName = "STATObjects", Exclude = true)]
+[GenerateITallyRequestableObect(Abstractions.Models.GenerationMode.Get)]
+[GenerateMeta]
+public partial class MasterStatistics : BaseStatistics
+{
+    [XmlElement(ElementName = "NAME")]
+    public TallyObjectType Name { get; set; }
+
+    public override string ToString()
+    {
+        return $"{Name} - {Count}";
+    }
+}
+
+[TDLCollection(CollectionName = "STATVchType", Exclude = true)]
+[GenerateITallyRequestableObect(Abstractions.Models.GenerationMode.Get)]
+[GenerateMeta]
+public partial class VoucherStatistics : BaseStatistics
+{
+    [XmlElement(ElementName = "NAME")]
+    public string Name { get; set; } = null!;
+
+    [XmlElement(ElementName = "CANCELLEDCOUNT")]
+    [TDLField(Set = "if $$ISEMPTY:$CancVal then 0 else $CancVal")]
+    public ulong CancelledCount { get; set; }
+
+    /// <summary>
+    /// returns total count irrespective of period
+    /// </summary>
+    [XmlElement(ElementName = "TOTALCOUNT")]
+    [TDLField(Set = "if $$ISEMPTY:$MigVal then 0 else $MigVal")]
+    public ulong TotalCount { get; set; }
+
+    /// <summary>
+    ///  return count based on period
+    /// </summary>
+    [XmlElement(ElementName = "COUNT")]
+    [TDLField(Set = "if $$ISEMPTY:$StatVal then 0 else $StatVal")]    
+    public ulong Count { get; set; }
+
+    [XmlElement(ElementName = "OPTIONALCOUNT")]
+    [TDLField(Set = "if $$ISEMPTY:$$DirectOptionalVch:$Name then 0 else $$DirectOptionalVch:$Name")]
+    public ulong OptionalCount { get; set; }
+
+
+    public override string ToString()
+    {
+        return $"{Name} - {Count}";
+    }
+}
